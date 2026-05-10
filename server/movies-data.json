@@ -1,0 +1,93 @@
+[
+  {
+    "title": "HIT 3",
+    "posterUrl": "images/poster/poster12.jpg",
+    "rating": "8.7",
+    "genres": ["Action", "Crime","Thriller"]
+  },
+  {
+    "title": "Kalki 2898 AD",
+    "posterUrl": "images/poster/poster13.jpg",
+    "rating": "9.8",
+    "genres": ["Action", "Sci-Fi"]
+  },
+  {
+    "title": "Eega",
+    "posterUrl": "images/poster/poster14.jpg",
+    "rating": "9.9",
+    "genres": ["Action", "Comedy"]
+  },
+  {
+    "title": "Salaar: Part 1 – Ceasefire",
+    "posterUrl": "images/poster/poster10.jpg",
+    "rating": "9.9",
+    "genres": ["Action", "Thriller"]
+  },
+  {
+    "title":"Sita Ramam",
+    "posterUrl": "images/poster/poster6.jpg",
+    "rating": "7.9",
+    "genres": ["Romance", "War"]
+  },
+  {
+    "title":"Baahubali 2: The Conclusion",
+    "posterUrl":"images/poster/poster11.jpg",
+    "rating":"10.0",
+    "genres":["Action", "Fantasy"]
+  },
+  {
+    "title":"Liger",
+    "posterUrl":"images/poster/poster4.jpg",
+    "rating":"4.6",
+    "genres":["Action", "Sport"]
+  },
+  {
+    "title":"RRR",
+    "posterUrl":"images/poster/poster17.jpg",
+    "rating":"10",
+    "genres":["Action", "Adventure"]
+  },
+  {
+    "title":"Kuberaa",
+    "posterUrl":"images/poster/poster16.jpg",
+    "rating":"8.8",
+    "genres":["Crime","Thriller"]
+  },
+  {
+    "title":"Avengers: Endgame",
+    "posterUrl":"images/poster/poster18.jpeg",
+    "rating":"9.8",
+    "genres":["Action","Sci-Fi"]
+  },
+  {
+    "title":"Inception",
+    "posterUrl":"images/poster/poster19.jpeg",
+    "rating":"9.8",
+    "genres":["Action","Sci-Fi"]
+  },
+  {
+    "title":"Athadu",
+    "posterUrl":"images/poster/poster20.jpg",
+    "rating":"8.2",
+    "genres":["Action","Thriller"]
+  },
+  {
+    "title":"Chhaava",
+    "posterUrl":"images/poster/poster21.jpg",
+    "rating":"9.5",
+    "genres":["Drama"]
+  },
+  {
+    "title":"Coolie",
+    "posterUrl":"images/poster/poster22.jpg",
+    "rating":"9.5",
+    "genres":["Action","Thriller"]
+  },
+  {
+    "title":"Manjummel Boys",
+    "posterUrl":"images/poster/poster23.jpg",
+    "rating":"8.4",
+    "genres":["Drama","Thriller"]
+  }
+
+]
