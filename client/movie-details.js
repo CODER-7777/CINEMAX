@@ -1,6 +1,21 @@
 const detailsContainer = document.getElementById('movie-details-container');
 const API_BASE_URL = '/api/movies';
 
+function generateStarHTML(rating) {
+    // Convert rating from 0-10 scale to 0-5 stars
+    const stars = parseFloat(rating) / 2;
+    const fullStars = Math.floor(stars);
+    const hasHalf = (stars - fullStars) >= 0.5;
+    const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
+    
+    let html = '<div class="star-rating">';
+    for (let i = 0; i < fullStars; i++) html += '<span class="star filled">★</span>';
+    if (hasHalf) html += '<span class="star half">★</span>';
+    for (let i = 0; i < emptyStars; i++) html += '<span class="star">★</span>';
+    html += '</div>';
+    return html;
+}
+
 async function fetchAndRenderMovieDetails() {
     const urlParams = new URLSearchParams(window.location.search);
     const movieId = urlParams.get('id');
@@ -41,14 +56,17 @@ async function fetchAndRenderMovieDetails() {
                     <div class="hero-text">
                         <h1>${movie.title}</h1>
                         <div class="hero-meta">
-                            <span class="hero-rating">${movie.rating} Match</span>
-                            <span>2024</span>
-                            <span>2h 15m</span>
+                            <span class="hero-rating">${generateStarHTML(movie.rating)} ${movie.rating}/10</span>
+                            <span>${movie.year || '2024'}</span>
+                            <span>${movie.runtime || 'N/A'}</span>
                         </div>
                         <p style="font-size: 1.1rem; max-width: 600px; line-height: 1.6; color: #d2d2d2;">
-                            An epic journey filled with action, drama, and breathtaking visuals. Discover the untold story in this cinematic masterpiece.
+                            ${movie.synopsis || 'No synopsis available.'}
                         </p>
                         <p style="margin-top: 15px; color: #808080;"><strong>Genres:</strong> ${movie.genres.join(', ')}</p>
+                        <p style="margin-top: 10px; color: #808080;">
+                            <strong>Cast:</strong> ${movie.cast ? movie.cast.join(', ') : 'N/A'}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -60,7 +78,7 @@ async function fetchAndRenderMovieDetails() {
                 <!-- YOUTUBE IFRAME -->
                 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 60px;">
                     <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
-                            src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&rel=0" 
+                            src="https://www.youtube.com/embed/${movie.trailerYoutubeId || 'dQw4w9WgXcQ'}?autoplay=0&rel=0" 
                             frameborder="0" 
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                             allowfullscreen>

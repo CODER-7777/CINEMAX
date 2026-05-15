@@ -382,8 +382,8 @@ ul.navitem1 li {
 /* Movie Card */
 .card {
     position: relative;
-    width: 220px;
-    min-width: 220px;
+    width: 100%;
+    min-width:unset;
     height: auto;
     background: #1a1a1a;
     border-radius: 8px;
@@ -526,6 +526,9 @@ ul.navitem1 li {
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    /* ADD THESE */
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 20px;
 }
 
 .enter-list::-webkit-scrollbar {
@@ -549,6 +552,7 @@ ul.navitem1 li {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     background: #1a1a1a;
     transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.35s ease;
+    scroll-snap-align: start;
 }
 
 .enter-container .card:hover {
@@ -914,18 +918,73 @@ div .text {
 /* ============================== */
 /* Responsive design */
 
-@media(max-width:992px){
-    .navbar{
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 24px;
+}
+.card {
+    width: 100%;        
+    min-width: unset;
+}
+
+/* for tab */
+@media (max-width: 992px) {
+    .navbar {
         padding: 0 2%;
     }
-    .movieslist,.enter-list{
-        padding-left:20px;
+    .movies-list, .enter-list {
+        padding-left: 20px;
     }
-    .card{
-        width:200px;
-        min-width: 200px;
+    .title, .title-enter {
+        padding-left: 30px;
     }
-    
+    .card-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* for phone */
+@media (max-width: 768px) {
+    .navitem, .navitem1 {
+        display: none;
+    }
+    .subnavbar {
+        display: none;
+    }
+    .input {
+        display: none;
+    }
+    .hamburger-menu {
+        display: block;
+    }
+    .right-container {
+        display: none;
+    }
+    .movies-list {
+        padding-left: 10px;
+        justify-content: center;
+    }
+    .title, .title-enter {
+        padding-left: 15px;
+        font-size: 1.8rem;
+    }
+    .card-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .card-img {
+        height: 240px;
+    }
+}
+
+/* Small phone */
+@media (max-width: 480px) {
+    .card-container {
+        grid-template-columns: 1fr;
+    }
+    .card-img {
+        height: 300px;
+    }
 }
 
 .hamburger-menu{
@@ -995,28 +1054,58 @@ div .text {
     color:#46d369;
     font-weight:bold;
 }
-@media(max-width:768px){
-    .navitem,.navitem1{
-        display: none;
-    }
-    .movies-list{
-        justify-content: center;
-    }
-    .card{
-        width:160px;
-        min-width: 160px;
-    }
-    .card-img{
-        height:240px;
-    }
-    .input{
-        display:none;
-    }
-    .hamburger-menu{
-        display:block;
-    }
-    .right-container{
-        display:none;
-    }
+
+
+/* ==============================
+   STAR RATING COMPONENT
+   ============================== */
+.star-rating {
+    display: inline-flex;
+    gap: 2px;
+    font-size: 16px;
 }
 
+.star-rating .star {
+    color: #333;
+    position: relative;
+}
+
+.star-rating .star.filled {
+    color: #ffc107;
+}
+
+.star-rating .star.half {
+    color: #333;
+}
+
+.star-rating .star.half::before {
+    content: '★';
+    position: absolute;
+    left: 0;
+    overflow: hidden;
+    width: 50%;
+    color: #ffc107;
+}
+
+/* ==============================
+   USER AVATAR (Post-Login)
+   ============================== */
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e50914, #b20710);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: transform 0.2s ease;
+}
+
+.user-avatar:hover {
+    transform: scale(1.1);
+}

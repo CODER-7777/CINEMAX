@@ -1,8 +1,23 @@
 const API_URL = '/api/movies';
+
+function generateStarHTML(rating) {
+    // Convert rating from 0-10 scale to 0-5 stars
+    const stars = parseFloat(rating) / 2;
+    const fullStars = Math.floor(stars);
+    const hasHalf = (stars - fullStars) >= 0.5;
+    const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
+    
+    let html = '<div class="star-rating">';
+    for (let i = 0; i < fullStars; i++) html += '<span class="star filled">★</span>';
+    if (hasHalf) html += '<span class="star half">★</span>';
+    for (let i = 0; i < emptyStars; i++) html += '<span class="star">★</span>';
+    html += '</div>';
+    return html;
+}
 const movieCardContainer = document.getElementById('movie-card-container');
 const movieSearchInput = document.getElementById('movie-search-input');
 const hamburgerIcon=document.getElementById('hamburger-icon');
-const sidebar=document.querySelector('.side-bar');
+const sidebar=document.querySelector('.sidebar');
 const overlay=document.querySelector('.overlay');
 
 async function fetchAndRenderMovies(movies = null) {
@@ -26,7 +41,7 @@ async function fetchAndRenderMovies(movies = null) {
                     <a href="movie-details.html?id=${movie._id}" style="text-decoration:none; color:inherit;">
                         <img src="${movie.posterUrl}" alt="${movie.title}" class="card-img" width="200">
                         <h3 class="movie-title">${movie.title}</h3>
-                        <p class="rating-text">Rating: ${movie.rating}</p>
+                        <p class="rating-text">${generateStarHTML(movie.rating)} ${movie.rating}</p>
                         <p class="genres-text">Genres: ${movie.genres.join(' / ')}</p>
                         <span class="watchlist-btn" data-movie-id="${movie._id}">&#x2764;</span>
                     </a>
@@ -44,8 +59,8 @@ async function fetchAndRenderMovies(movies = null) {
 movieCardContainer.addEventListener('click', async (e) => {
     if (e.target.classList.contains('watchlist-btn')) {
         const token = localStorage.getItem('userToken');
-        if (!token) {
-            alert('Movie is added to your watchlist');
+        if (!token || isTokenExpired(token)) {
+            document.getElementById('id01').style.display = 'block';
             return;
         }
 
@@ -100,6 +115,14 @@ if(overlay){
     });
 }
 document.addEventListener('DOMContentLoaded', () => {
+    // Check if token is expired
+    const token = localStorage.getItem('userToken');
+    if (token && isTokenExpired(token)) {
+        localStorage.removeItem('userToken');
+        localStorage.removeItem('userEmail');
+        // Token was expired, cleaned up silently
+    }
+    
     fetchAndRenderMovies();
     checkAuthStatus();
 });
@@ -114,13 +137,56 @@ const navbarAuthBtn = document.getElementById('navbar-auth-btn');
 
 function checkAuthStatus() {
     const token = localStorage.getItem('userToken');
+    const email = localStorage.getItem('userEmail');
+    
     if (token && navbarAuthBtn) {
-        navbarAuthBtn.innerText = 'Logout';
-        navbarAuthBtn.onclick = () => {
-            localStorage.removeItem('userToken');
-            alert('Logged out successfully');
-            window.location.reload();
-        };
+        // Change button to show user avatar + dropdown
+        const rightContainer = document.querySelector('.right-container');
+        if (rightContainer) {
+            // Replace "Sign In" button with user avatar & logout
+            const userInitial = email ? email.charAt(0).toUpperCase() : 'U';
+            rightContainer.innerHTML = `
+                <a href="#" class="location">Hyderabad<ion-icon name="caret-down-sharp"></ion-icon></a>
+                <div class="user-avatar" id="user-avatar">${userInitial}</div>
+                <button class="signin" id="logout-btn">Logout</button>
+            `;
+            
+            // Logout handler
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                localStorage.removeItem('userToken');
+                localStorage.removeItem('userEmail');
+                window.location.reload();
+            });
+        }
+        
+        // Update sidebar greeting
+        const sidebarGreeting = document.querySelector('.sidenavbar h1');
+        if (sidebarGreeting && email) {
+            sidebarGreeting.textContent = `Hey, ${email.split('@')[0]}!`;
+        }
+        
+        // Update sidebar login button to "My Account"
+        const sidebarLoginBtn = document.querySelector('.sidesubnavbar .login');
+        if (sidebarLoginBtn) {
+            sidebarLoginBtn.textContent = 'My Account';
+            sidebarLoginBtn.onclick = null; // Remove modal trigger
+        }
+        
+        // Enable disabled sidebar links
+        document.querySelectorAll('.sidebar .btn-disabled').forEach(link => {
+            link.classList.remove('btn-disabled');
+        });
+    }
+}
+
+function isTokenExpired(token) {
+    try {
+        // JWT has 3 parts: header.payload.signature
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        // payload.exp is in seconds, Date.now() is in milliseconds
+        return payload.exp * 1000 < Date.now();
+    } catch (e) {
+        return true; // If we can't decode it, treat as expired
     }
 }
 
@@ -159,6 +225,7 @@ if (signinForm) {
             if (response.ok) {
                 // Save the JWT token to the browser!
                 localStorage.setItem('userToken', data.token);
+                localStorage.setItem('userEmail', email);
                 document.getElementById('id01').style.display = 'none'; // Close modal
                 alert('Signed in successfully!');
                 window.location.reload(); // Refresh to update navbar

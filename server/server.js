@@ -34,7 +34,13 @@ const movieSchema = new mongoose.Schema({
     posterUrl: { type: String, required: true },
     rating: { type: String },
     genres: { type: [String] },
+    synopsis: { type: String, default: 'No synopsis available.' },
+    trailerYoutubeId: { type: String, default: '' },
+    cast: { type: [String], default: [] },
+    runtime: { type: String, default: '' },
+    year: { type: String, default: '' },
 });
+
 const Movie = mongoose.model('Movie', movieSchema);
 
 // --- Middleware for Authentication ---

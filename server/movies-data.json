@@ -3,91 +3,154 @@
     "title": "HIT 3",
     "posterUrl": "images/poster/poster12.jpg",
     "rating": "8.7",
-    "genres": ["Action", "Crime","Thriller"]
+    "genres": ["Action", "Crime", "Thriller"],
+    "synopsis": "The third installment of the HIT series follows a brilliant cop solving a complex serial murder case.",
+    "trailerYoutubeId": "kAtfaaUgDRU",
+    "cast": ["Nani", "Srinidhi Shetty"],
+    "runtime": "2h 30m",
+    "year": "2025"
   },
   {
     "title": "Kalki 2898 AD",
     "posterUrl": "images/poster/poster13.jpg",
     "rating": "9.8",
-    "genres": ["Action", "Sci-Fi"]
+    "genres": ["Action", "Sci-Fi"],
+    "synopsis": "In a dystopian future, a cop hunts a wanted rebel in a land ravaged by drought and war.",
+    "trailerYoutubeId": "y1-w1kUGuz8",
+    "cast": ["Prabhas", "Deepika Padukone", "Amitabh Bachchan"],
+    "runtime": "2h 45m",
+    "year": "2024"
   },
   {
     "title": "Eega",
     "posterUrl": "images/poster/poster14.jpg",
     "rating": "9.9",
-    "genres": ["Action", "Comedy"]
+    "genres": ["Action", "Comedy"],
+    "synopsis": "A reincarnated fly seeks revenge on the man who murdered him and stole his love.",
+    "trailerYoutubeId": "01_8XnNolN4",
+    "cast": ["Nani", "Samantha Ruth Prabhu"],
+    "runtime": "2h 20m",
+    "year": "2012"
   },
   {
     "title": "Salaar: Part 1 – Ceasefire",
     "posterUrl": "images/poster/poster10.jpg",
     "rating": "9.9",
-    "genres": ["Action", "Thriller"]
+    "genres": ["Action", "Thriller"],
+    "synopsis": "A mysterious man enters a violent world to fulfill a promise to his dying friend.",
+    "trailerYoutubeId": "YOUR_YOUTUBE_ID_HERE",
+    "cast": ["Prabhas", "Shruti Haasan"],
+    "runtime": "2h 55m",
+    "year": "2023"
   },
   {
-    "title":"Sita Ramam",
+    "title": "Sita Ramam",
     "posterUrl": "images/poster/poster6.jpg",
     "rating": "7.9",
-    "genres": ["Romance", "War"]
+    "genres": ["Romance", "War"],
+    "synopsis": "A soldier embarks on a mission to deliver a letter from a prince to his love, bridging a gap of 20 years.",
+    "trailerYoutubeId": "YOUR_YOUTUBE_ID_HERE",
+    "cast": ["Dulquer Salmaan", "Mrunal Thakur"],
+    "runtime": "2h 32m",
+    "year": "2022"
   },
   {
-    "title":"Baahubali 2: The Conclusion",
-    "posterUrl":"images/poster/poster11.jpg",
-    "rating":"10.0",
-    "genres":["Action", "Fantasy"]
+    "title": "Baahubali 2: The Conclusion",
+    "posterUrl": "images/poster/poster11.jpg",
+    "rating": "10.0",
+    "genres": ["Action", "Fantasy"],
+    "synopsis": "The epic conclusion to the saga of Mahishmati as Mahendra Baahubali claims his rightful throne.",
+    "trailerYoutubeId": "YOUR_YOUTUBE_ID_HERE",
+    "cast": ["Prabhas", "Rana Daggubati", "Anushka Shetty"],
+    "runtime": "2h 47m",
+    "year": "2017"
   },
   {
-    "title":"Liger",
-    "posterUrl":"images/poster/poster4.jpg",
-    "rating":"4.6",
-    "genres":["Action", "Sport"]
+    "title": "Liger",
+    "posterUrl": "images/poster/poster4.jpg",
+    "rating": "4.6",
+    "genres": ["Action", "Sport"],
+    "synopsis": "A street fighter from Mumbai rises to become a national champion with the help of his mother.",
+    "trailerYoutubeId": "YOUR_YOUTUBE_ID_HERE",
+    "cast": ["Vijay Deverakonda", "Ananya Panday"],
+    "runtime": "2h 20m",
+    "year": "2022"
   },
   {
-    "title":"RRR",
-    "posterUrl":"images/poster/poster17.jpg",
-    "rating":"10",
-    "genres":["Action", "Adventure"]
+    "title": "RRR",
+    "posterUrl": "images/poster/poster17.jpg",
+    "rating": "10",
+    "genres": ["Action", "Adventure"],
+    "synopsis": "Two legendary revolutionaries join forces to fight against the British Raj in colonial India.",
+    "trailerYoutubeId": "YOUR_YOUTUBE_ID_HERE",
+    "cast": ["Jr. NTR", "Ram Charan", "Alia Bhatt"],
+    "runtime": "3h 08m",
+    "year": "2022"
   },
   {
-    "title":"Kuberaa",
-    "posterUrl":"images/poster/poster16.jpg",
-    "rating":"8.8",
-    "genres":["Crime","Thriller"]
+    "title": "Kuberaa",
+    "posterUrl": "images/poster/poster16.jpg",
+    "rating": "8.8",
+    "genres": ["Crime", "Thriller"],
+    "synopsis": "A common man seeks revenge against a powerful gangster who ruined his family.",
+    "trailerYoutubeId": "YOUR_YOUTUBE_ID_HERE",
+    "cast": ["Dhanush", "Jim Sarbh"],
+    "runtime": "2h 30m",
+    "year": "2025"
   },
   {
-    "title":"Avengers: Endgame",
-    "posterUrl":"images/poster/poster18.jpeg",
-    "rating":"9.8",
-    "genres":["Action","Sci-Fi"]
+    "title": "Avengers: Endgame",
+    "posterUrl": "images/poster/poster18.jpeg",
+    "rating": "9.8",
+    "genres": ["Action", "Sci-Fi"],
+    "synopsis": "The remaining Avengers must reverse Thanos's snap and restore balance to the universe.",
+    "trailerYoutubeId": "YOUR_YOUTUBE_ID_HERE",
+    "cast": ["Robert Downey Jr.", "Chris Evans", "Mark Ruffalo"],
+    "runtime": "3h 01m",
+    "year": "2019"
   },
   {
-    "title":"Inception",
-    "posterUrl":"images/poster/poster19.jpeg",
-    "rating":"9.8",
-    "genres":["Action","Sci-Fi"]
+    "title": "Inception",
+    "posterUrl": "images/poster/poster19.jpeg",
+    "rating": "9.8",
+    "genres": ["Action", "Sci-Fi"],
+    "synopsis": "A thief who steals information by entering people's dreams is offered a chance to have his criminal history erased if he can plant an idea into a CEO's subconscious.",
+    "trailerYoutubeId": "YOUR_YOUTUBE_ID_HERE",
+    "cast": ["Leonardo DiCaprio", "Joseph Gordon-Levitt"],
+    "runtime": "2h 28m",
+    "year": "2010"
   },
   {
-    "title":"Athadu",
-    "posterUrl":"images/poster/poster20.jpg",
-    "rating":"8.2",
-    "genres":["Action","Thriller"]
+    "title": "Athadu",
+    "posterUrl": "images/poster/poster20.jpg",
+    "rating": "8.2",
+    "genres": ["Action", "Thriller"],
+    "synopsis": "A wanted assassin assumes a new identity to escape his past, only to find himself entangled in a web of family drama.",
+    "trailerYoutubeId": "YOUR_YOUTUBE_ID_HERE",
+    "cast": ["Mahesh Babu", "Trisha Krishnan"],
+    "runtime": "2h 50m",
+    "year": "2005"
   },
   {
-    "title":"Chhaava",
-    "posterUrl":"images/poster/poster21.jpg",
-    "rating":"9.5",
-    "genres":["Drama"]
+    "title": "Chhaava",
+    "posterUrl": "images/poster/poster21.jpg",
+    "rating": "9.5",
+    "genres": ["Drama"],
+    "synopsis": "The historical epic of Chhatrapati Sambhaji Maharaj and his brave defiance against the Mughal Empire.",
+    "trailerYoutubeId": "YOUR_YOUTUBE_ID_HERE",
+    "cast": ["Vicky Kaushal", "Rashmika Mandanna"],
+    "runtime": "2h 40m",
+    "year": "2025"
   },
   {
-    "title":"Coolie",
-    "posterUrl":"images/poster/poster22.jpg",
-    "rating":"9.5",
-    "genres":["Action","Thriller"]
-  },
-  {
-    "title":"Manjummel Boys",
-    "posterUrl":"images/poster/poster23.jpg",
-    "rating":"8.4",
-    "genres":["Drama","Thriller"]
+    "title": "Coolie",
+    "posterUrl": "images/poster/poster22.jpg",
+    "rating": "9.5",
+    "genres": ["Action", "Thriller"],
+    "synopsis": "A wronged man seeks revenge on the corrupt officials who framed him and destroyed his life.",
+    "trailerYoutubeId": "YOUR_YOUTUBE_ID_HERE",
+    "cast": ["Rajinikanth", "Meena"],
+    "runtime": "2h 35m",
+    "year": "2025"
   }
-
 ]
