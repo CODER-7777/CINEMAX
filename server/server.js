@@ -25,7 +25,9 @@ mongoose.connect(process.env.MONGO_URI)
 const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    watchlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Movie' }] 
+    watchlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Movie' }],
+    resetOtp: { type: String },
+    resetOtpExpiry: { type: Date }
 });
 const User = mongoose.model('User', userSchema);
 
@@ -83,9 +85,50 @@ app.post('/api/users/signin', async (req, res) => {
     } catch (err) { res.status(500).json({ message: 'Error signing in' }); }
 });
 
-// Movie Data
 
-// IMPORTANT: Put the specific routes first
+app.post('/api/users/forgot-password',async(req,res)=>{
+    const {email}=req.body;
+    try{
+        const user=await User.findOne({email});
+        if(!user) return res.status(404).json({message:'User not found'});
+        const otp =Math.floor(100000+Math.random()*900000).toString();
+        user.resetOtp=otp;
+        user.resetOtpExpiry=new Date(Date.now()+15*60*1000);
+        await user.save();
+        console.log(`\n\nEmail Sent`);
+        console.log(`To:${email}`);
+        console.log(`Subject:CINEMAX Password reset`);
+        console.log(`Your OTP is : ${otp}`);
+        console.log(`Thank You`);
+        res.status(200).json({message:'OTP Generated Successfully ! Check your server terminal'});
+    } 
+    catch(err) {
+        console.error(err);
+        res.status(500).json({message:'Internal Server Error'});
+    }
+});
+
+
+app.post('/api/users/reset-password',async(req,res)=>{
+    const{email,otp,newPassword}=req.body;
+    try{
+        const user=await User.findOne({email});
+        if(!user) return res.status(404).json({message:'User not found'});
+        if(user.resetOtp !==otp || user.resetOtpExpiry< Date.now()){
+            return res.status(400).json({message:'Invalid or Expired OTP'});
+        }
+        const hashedPassword=await bcrypt.hash(newPassword,10);
+        user.password=hashedPassword;
+        user.resetOtp=undefined;
+        user.resetOtpExpiry=undefined;
+        await user.save();
+        res.status(200).json({message:'Password reser successfully! You can now sign in,'});
+    }catch(err){
+        res.status(500).json({message:'Error resetting the password.'});
+    }
+});
+
+
 app.get('/api/movies/upload', async (req, res) => {
     try {
         const dataPath = path.join(__dirname, 'movies-data.json');

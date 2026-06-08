@@ -249,24 +249,42 @@
                     </span>
                 </div>
                 <div class="auth-form-container">
-                    <form id="signin-form" style="display: flex;flex-direction: column;gap: 15px;">
-                        <input type="email" id="signin-email" placeholder="Email Address" required style="padding: 12px;  background: rgba(255, 255, 255, 0.05);border: 1px solid rgba(255, 255, 255, 0.1);border-radius: 6px;color: white;">
-                        <input type="password" id="signin-password" placeholder="Password" required style="padding: 12px;  background: rgba(255, 255, 255, 0.05);border: 1px solid rgba(255, 255, 255, 0.1);border-radius: 6px;color: white;">
-                        <button type="submit" style="padding: 12px;background: #e50914;color: white;border: none;border-radius: 6px;font-weight: bold;cursor: pointer;">Sign In</button>
-                        <p style="text-align: center;color: #b3b3b3;font-size: 13px;margin-top: 10px;">
-                            New to Cinemax? <a href="#" id="show-signup" style="color: #fff;">Sign up now</a>
+                    <form id="signin-form" style="display: flex;flex-direction: column;gap:15px;">
+                        <input type="email" id="signin-email" placeholder="Email Address" required style="padding: 12px;background: rgba(255, 255, 255, 0.05);border: 1px solid rgba(255,255,255,0.1);border-radius: 6px;color: white;">
+                        <input type="password" id="signin-password" placeholder="password" required style="padding: 12px;background: rgba(255, 255, 255, 0.05);border: 1px solid rgba(255,255,255,0.1);border-radius: 6px;color: white;">
+                        <button type="submit"  style="padding: 12px;background: #e50914;color:white;border: none;border-radius:6px;font-weight:bold;cursor:pointer;">Sign In</button>
+                        <p style="text-align: center;color: #b3b3b3;font-size: 13px;margin-top:10px;">
+                            <a href="#" id="show-forgot-password" style="color: #fff;display: block;margin-bottom: 10px;">Forgot Password?</a>
+                            New to CINEMAX?<a href="#" id="show-signup" style="color: #fff;">Sign Up now</a>
                         </p>
                     </form>
-
+                    <!-- signup-form from here -->
                     <form id="signup-form" style="display: none;flex-direction: column;gap: 15px;">
-                        <input type="email" id="signup-email" placeholder="Email Address" required style="padding: 12px;  background: rgba(255, 255, 255, 0.05);border: 1px solid rgba(255, 255, 255, 0.1);border-radius: 6px;color: white;">
-                        <input type="password" id="signup-password" placeholder="Password" required style="padding: 12px;  background: rgba(255, 255, 255, 0.05);border: 1px solid rgba(255, 255, 255, 0.1);border-radius: 6px;color: white;">
+                        <input type="email" id="signup-email" placeholder="Email Address" required style="padding: 12px; background: rgba(255, 255, 255, 0.05);border: 1px solid rgba(255, 255, 255, 0.1);border-radius: 6px;color: white;">
+                        <input type="password" id="signup-password" placeholder="Password" required style="padding: 12px; background: rgba(255, 255, 255, 0.05);border: 1px solid rgba(255, 255, 255, 0.1);border-radius: 6px;color: white;">
                         <button type="submit" style="padding: 12px;background: #e50914;color: white;border: none;border-radius: 6px;font-weight: bold;cursor: pointer;">Create Account</button>
                         <p style="text-align: center;color: #b3b3b3;font-size: 13px;margin-top: 10px;">
                             Already have an account? <a href="#" id="show-signin" style="color: #fff;">Sign in now</a>
                         </p>
                     </form>
-                    <p id="auth-error-message" style="color:red; text-align:center;font-size: 13px;margin-top: 10px;"></p>
+                    <form id="forgot-password-form" style="display: none;flex-direction: column;gap: 15px;">
+                        <h4 style="color: #fff; margin: 0; text-align: center;">Reset Password</h4>
+                        <input type="email" id="forgot-email" placeholder="Enter your email to receive an OTP" required style="padding: 12px; background: rgba(255, 255, 255, 0.05);border: 1px solid rgba(255, 255, 255, 0.1);border-radius: 6px;color: white;">
+                        <button type="submit" style="padding: 12px;background: #e50914;color: white;border: none;border-radius: 6px;font-weight: bold;cursor: pointer;">Send OTP</button>
+                        <p style="text-align: center;color: #b3b3b3;font-size: 13px;margin-top: 10px;">
+                                 Remembered? <a href="#" id="back-to-signin-1" style="color: #fff;">Back to Sign In</a>
+                        </p>
+                    </form>
+                    <form id="reset-password-form" style="display: none;flex-direction: column;gap: 15px;">
+                        <h4 style="color: #fff; margin: 0; text-align: center;">Enter OTP & New Password</h4>
+                        <input type="text" id="reset-otp" placeholder="6-digit OTP" required style="padding: 12px; background: rgba(255, 255, 255, 0.05);border: 1px solid rgba(255, 255, 255, 0.1);border-radius: 6px;color: white;">
+                        <input type="password" id="reset-new-password" placeholder="New Password" required style="padding: 12px; background: rgba(255, 255, 255, 0.05);border: 1px solid rgba(255, 255, 255, 0.1);border-radius: 6px;color: white;">
+                        <button type="submit" style="padding: 12px;background: #e50914;color: white;border: none;border-radius: 6px;font-weight: bold;cursor: pointer;">Reset Password</button>
+                        <p style="text-align: center;color: #b3b3b3;font-size: 13px;margin-top: 10px;">
+                            <a href="#" id="back-to-signin-2" style="color: #fff;">Cancel Reset</a>
+                        </p>
+                    </form>
+                    <p id ="auth-error-message" style="color: red;text-align: center;font-size: 13px;margin-top: 10px;"></p>
                 </div>
             </div>
         </div>

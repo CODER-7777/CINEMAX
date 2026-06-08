@@ -266,3 +266,114 @@ if (signupForm) {
         }
     });
 }
+
+const forgotPasswordForm=document.getElementById('forgot-password-form');
+const resetPasswordForm=document.getElementById('reset-password-form');
+const showForgotBtn=document.getElementById('show-forgot-password');
+// const showSigninBtn=document.getElementById('show-signin');
+const backToSignin1=document.getElementById('back-to-signin-1');
+const backToSignin2=document.getElementById('back-to-signin-2');
+
+function hideAllAuthForms(){
+    if(signinForm) signinForm.style.display='none';
+    if(signupForm) signupForm.style.display='none';
+    if(forgotPasswordForm) forgotPasswordForm.style.display='none';
+    if(resetPasswordForm) resetPasswordForm.style.display='none';
+    if(authErrorMessage) authErrorMessage.innerText='';
+}
+
+if(showSignupBtn){
+    showSignupBtn.addEventListener('click',(e)=>{
+        e.preventDefault();
+        hideAllAuthForms();
+        signupForm.style.display='flex';
+    });
+}
+
+if(showSigninBtn){
+    showSigninBtn.addEventListener('click',(e)=>{
+        e.preventDefault();
+        hideAllAuthForms();
+        signinForm.style.display='flex';
+    });
+}
+
+if(showForgotBtn){
+    showForgotBtn.addEventListener('click',(e)=>{
+        e.preventDefault();
+        hideAllAuthForms();
+        forgotPasswordForm.style.display='flex';
+    });
+}
+
+[backToSignin1, backToSignin2].forEach(btn => {
+    if (btn) {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            hideAllAuthForms();
+            signinForm.style.display = 'flex';
+        });
+    }
+});
+
+if(forgotPasswordForm){
+    forgotPasswordForm.addEventListener('submit',async(e)=>{
+        e.preventDefault();
+        const email=document.getElementById('forgot-email').value;
+        try{
+            const response=await fetch('/api/users/forgot-password',{
+                method:'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            const data=await response.json();
+            if(response.ok){
+                authErrorMessage.style.color='#46d369';
+                authErrorMessage.innerText=data.message;
+                setTimeout(()=>{
+                    hideAllAuthForms();
+                    resetPasswordForm.style.display='flex';
+                },1500);
+            }
+            else{
+                authErrorMessage.style.color='#e50914';
+                authErrorMessage.innerText=data.message;
+            }
+        }catch(error){
+            authErrorMessage.style.color='#e50914';
+            authErrorMessage.innerText='Server error. Try again later.';
+        }
+    });
+}
+
+if (resetPasswordForm) {
+    resetPasswordForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('forgot-email').value; 
+        const otp = document.getElementById('reset-otp').value;
+        const newPassword = document.getElementById('reset-new-password').value;
+        try {
+            const response = await fetch('/api/users/reset-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, otp, newPassword })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                authErrorMessage.style.color = '#46d369';
+                authErrorMessage.innerText = data.message;
+                // Go back to sign in after success
+                setTimeout(() => {
+                    hideAllAuthForms();
+                    signinForm.style.display = 'flex';
+                }, 2000);
+            } else {
+                authErrorMessage.style.color = '#e50914';
+                authErrorMessage.innerText = data.message;
+            }
+        } catch (error) {
+            authErrorMessage.style.color = '#e50914';
+            authErrorMessage.innerText = 'Server error. Try again later.';
+        }
+    });
+}
