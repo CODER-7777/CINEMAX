@@ -56,7 +56,7 @@ async function fetchAndRenderMovieDetails() {
                     <div class="hero-text">
                         <h1>${movie.title}</h1>
                         <div class="hero-meta">
-                            <span class="hero-rating">${generateStarHTML(movie.rating)} ${movie.rating}/10</span>
+                            <span class="hero-rating">⭐ ${movie.computedRating || movie.rating}</span>
                             <span>${movie.year || '2024'}</span>
                             <span>${movie.runtime || 'N/A'}</span>
                         </div>
@@ -85,6 +85,12 @@ async function fetchAndRenderMovieDetails() {
                     </iframe>
                 </div>
 
+                <!-- SHOWTIMES SECTION -->
+                <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; letter-spacing: 1px; margin-bottom: 20px; color: #fff;">Available Showtimes</h2>
+                <div id="showtimes-container" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 60px;">
+                    <p style="color: #b3b3b3;">Loading showtimes...</p>
+                </div>
+
                 <!-- SIMILAR MOVIES SECTION -->
                 <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; letter-spacing: 1px; margin-bottom: 20px; color: #fff;">Similar Movies</h2>
                 <div class="movies-list" style="padding-left: 0;">
@@ -92,11 +98,72 @@ async function fetchAndRenderMovieDetails() {
                         <p style="color: #b3b3b3;">Loading similar movies...</p>
                     </div>
                 </div>
+
+                <!-- REVIEWS SECTION -->
+                <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; letter-spacing: 1px; margin-top: 60px; margin-bottom: 20px; color: #fff;">Reviews & Ratings</h2>
+                
+                <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                    <h3 style="margin-bottom: 15px; color: #fff;">Leave a Review</h3>
+                    <form id="review-form" style="display: flex; flex-direction: column; gap: 15px;">
+                        <div class="star-rating">
+                            <input type="radio" id="star5" name="rating" value="5" required /><label for="star5" title="5 stars">★</label>
+                            <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars">★</label>
+                            <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars">★</label>
+                            <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars">★</label>
+                            <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star">★</label>
+                        </div>
+                        <textarea id="review-text" rows="3" placeholder="What did you think of the movie?" required style="background: rgba(0,0,0,0.5); color: white; border: 1px solid #444; padding: 10px; border-radius: 4px; font-family: 'Inter', sans-serif;"></textarea>
+                        <button type="submit" style="background: #e50914; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; align-self: flex-start; font-weight: bold;">Submit Review</button>
+                        <p id="review-error" style="color: #e50914;"></p>
+                    </form>
+                </div>
+
+                <div id="reviews-list-container">
+                    ${renderReviews(movie.reviews)}
+                </div>
             </div>
         `;
 
+        // Attach review form listener
+        const reviewForm = document.getElementById('review-form');
+        reviewForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const ratingInput = document.querySelector('input[name="rating"]:checked');
+            const text = document.getElementById('review-text').value;
+            const errorMsg = document.getElementById('review-error');
+            const token = localStorage.getItem('userToken');
+
+            if (!token) {
+                errorMsg.innerText = 'Please sign in to leave a review.';
+                return;
+            }
+            if (!ratingInput) {
+                errorMsg.innerText = 'Please select a star rating.';
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/reviews', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ movieId: movie._id, rating: parseInt(ratingInput.value), text })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    window.location.reload();
+                } else {
+                    errorMsg.innerText = data.message || 'Error submitting review.';
+                }
+            } catch (err) {
+                errorMsg.innerText = 'Server error. Try again.';
+            }
+        });
+
         // Fetch and render similar movies
         await fetchAndRenderSimilarMovies(movie);
+        
+        // Fetch and render available showtimes
+        await fetchShowtimes(movieId);
 
     } catch (error) {
         console.error('Error fetching movie details:', error);
@@ -144,6 +211,72 @@ async function fetchAndRenderSimilarMovies(currentMovie) {
         console.error('Error loading similar movies:', error);
         similarContainer.innerHTML = '<p style="color: red;">Failed to load similar movies.</p>';
     }
+}
+
+async function fetchShowtimes(movieId) {
+    const showtimesContainer = document.getElementById('showtimes-container');
+    if (!showtimesContainer) return;
+
+    try {
+        const response = await fetch(`/api/showtimes/movie/${movieId}`);
+        const showtimes = await response.json();
+
+        if (showtimes.length === 0) {
+            showtimesContainer.innerHTML = '<p style="color: #b3b3b3;">No showtimes available for this movie.</p>';
+            return;
+        }
+
+        showtimesContainer.innerHTML = '';
+        showtimes.forEach(st => {
+            const stDiv = document.createElement('div');
+            stDiv.style.background = 'rgba(255,255,255,0.05)';
+            stDiv.style.padding = '15px 20px';
+            stDiv.style.borderRadius = '8px';
+            stDiv.style.display = 'flex';
+            stDiv.style.justifyContent = 'space-between';
+            stDiv.style.alignItems = 'center';
+            stDiv.style.border = '1px solid rgba(255,255,255,0.1)';
+
+            stDiv.innerHTML = `
+                <div>
+                    <h3 style="margin: 0 0 5px 0; color: #fff; font-size: 1.2rem;">${st.theatreName}</h3>
+                    <p style="margin: 0; color: #b3b3b3; font-size: 0.9rem;">Date: ${st.date} &nbsp;|&nbsp; Time: ${st.time}</p>
+                </div>
+                <button onclick="window.location.href='booking.html?showtimeId=${st._id}'" style="background: #e50914; color: #fff; border: none; padding: 10px 20px; border-radius: 4px; font-weight: bold; cursor: pointer;">
+                    Book Tickets
+                </button>
+            `;
+            showtimesContainer.appendChild(stDiv);
+        });
+
+    } catch (error) {
+        console.error('Error fetching showtimes:', error);
+        showtimesContainer.innerHTML = '<p style="color: #e50914;">Failed to load showtimes.</p>';
+    }
+}
+
+// Function to render reviews HTML
+function renderReviews(reviews) {
+    if (!reviews || reviews.length === 0) {
+        return '<p style="color: #888;">No reviews yet. Be the first to review!</p>';
+    }
+    
+    return reviews.map(review => {
+        const date = new Date(review.createdAt).toLocaleDateString();
+        const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+        const emailPrefix = review.userId && review.userId.email ? review.userId.email.split('@')[0] : 'Anonymous';
+        
+        return `
+            <div class="review-card">
+                <div class="review-header">
+                    <span class="review-email">${emailPrefix}</span>
+                    <span class="review-date">${date}</span>
+                </div>
+                <div class="review-stars">${stars}</div>
+                <p class="review-text">${review.text}</p>
+            </div>
+        `;
+    }).join('');
 }
 
 document.addEventListener('DOMContentLoaded', fetchAndRenderMovieDetails);

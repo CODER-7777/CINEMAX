@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Seats - CINEMAX</title>
+    <link rel="stylesheet" href="booking.css">
+    <!-- Razorpay SDK -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <div class="booking-container">
+        <!-- Navigation Back -->
+        <div style="text-align: left; margin-bottom: 20px;">
+            <a href="makemytrip.html" style="color: #b3b3b3; text-decoration: none;">&larr; Back to Home</a>
+        </div>
+
+        <div class="movie-info" id="movie-info">
+            <h1>Loading...</h1>
+            <p>Please wait while we fetch the showtime details.</p>
+        </div>
+
+        <!-- Perspective wrapper for the screen -->
+        <div style="perspective: 1000px; margin-top: 50px;">
+            <div class="screen"></div>
+        </div>
+        <p style="color: #666; margin-bottom: 40px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;">Screen This Side</p>
+
+        <!-- Dynamic Seat Map -->
+        <div class="seat-map" id="seat-map">
+            <!-- Seats injected via JS -->
+        </div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-item"><div class="legend-color" style="background:#46d369"></div> Regular (₹150)</div>
+            <div class="legend-item"><div class="legend-color" style="background:#ffc107"></div> Premium (₹250)</div>
+            <div class="legend-item"><div class="legend-color" style="background:#e50914"></div> Recliner (₹400)</div>
+            <div class="legend-item"><div class="legend-color" style="background:#007bff"></div> Selected</div>
+            <div class="legend-item"><div class="legend-color" style="background:#222"></div> Booked</div>
+        </div>
+
+        <!-- Checkout Panel -->
+        <div class="checkout-panel">
+            <div class="price-details">
+                <p>Selected Seats: <span id="selected-count" style="color:#fff; font-weight:bold;">0</span></p>
+                <p>Seats: <span id="selected-names" style="color:#fff;">-</span></p>
+                <h3>Total: ₹<span id="total-price">0</span></h3>
+            </div>
+            <button class="pay-btn" id="pay-btn" disabled>Pay Now</button>
+        </div>
+    </div>
+
+    <script src="booking.js"></script>
+</body>
+</html>

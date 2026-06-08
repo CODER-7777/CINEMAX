@@ -1109,3 +1109,53 @@ div .text {
 .user-avatar:hover {
     transform: scale(1.1);
 }
+ 
+ /* REVIEWS & RATINGS */
+.star-rating {
+    direction: rtl;
+    display: inline-flex;
+}
+.star-rating input {
+    display: none;
+}
+.star-rating label {
+    color: #444;
+    font-size: 2rem;
+    padding: 0;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label {
+    color: #ffb400;
+}
+.review-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+.review-email {
+    font-weight: bold;
+    color: #fff;
+}
+.review-date {
+    color: #888;
+    font-size: 0.9rem;
+}
+.review-text {
+    color: #ccc;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+.review-stars {
+    color: #ffb400;
+    letter-spacing: 2px;
+}
