@@ -11,15 +11,14 @@ const PDFDocument = require('pdfkit');
 const QRCode = require('qrcode');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const { GoogleGenAI } = require('@google/genai');
+const { exec } = require('child_process');
 
-let transporter;
-nodemailer.createTestAccount().then(account => {
-    transporter = nodemailer.createTransport({
-        host: account.smtp.host, port: account.smtp.port, secure: account.smtp.secure,
-        auth: { user: account.user, pass: account.pass }
-    });
-    console.log('Nodemailer ethereal email ready.');
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+let transporter = nodemailer.createTransport({
+    jsonTransport: true
 });
+console.log('Nodemailer json transport ready (mocking emails).');
 
 // Function to generate PDF buffer
 const generateTicketBuffer = async (booking, showtime) => {
@@ -50,7 +49,16 @@ const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_placeholder',
     key_secret: process.env.RAZORPAY_KEY_SECRET || 'placeholder_secret'
 });
+
 const app = express();
+const http = require('http');
+const { Server } = require('socket.io');
+
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: { origin: '*' }
+});
+
 const port = process.env.PORT || 5000;
 
 app.use(cors());
@@ -59,16 +67,15 @@ app.use(express.json());
 // --- Serve Frontend Static Files ---
 app.use(express.static(path.join(__dirname, '../client')));
 
-// --- Database Connection ---
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('MongoDB connected successfully!'))
-    .catch(err => console.error('MongoDB connection error:', err));
+// --- Database Connection is initialized after schemas below ---
 
 // --- Schemas and Models ---
 const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    role: { type: String, enum: ['user', 'admin'], default: 'user' },
     watchlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Movie' }],
+    points: { type: Number, default: 0 },
     resetOtp: { type: String },
     resetOtpExpiry: { type: Date }
 });
@@ -123,6 +130,61 @@ const reviewSchema = new mongoose.Schema({
 });
 const Review = mongoose.model('Review', reviewSchema);
 
+// --- Database Connection and Auto-Seeding ---
+mongoose.connect(process.env.MONGO_URI)
+    .then(async () => {
+        console.log('MongoDB connected successfully!');
+        try {
+            const movieCount = await Movie.countDocuments();
+            if (movieCount === 0) {
+                const dataPath = path.join(__dirname, 'movies-data.json');
+                const data = fs.readFileSync(dataPath, 'utf8');
+                const moviesToUpload = JSON.parse(data);
+                await Movie.insertMany(moviesToUpload);
+                console.log(`Auto-seeded ${moviesToUpload.length} movies.`);
+            }
+
+            const showtimeCount = await Showtime.countDocuments();
+            if (showtimeCount === 0) {
+                const movies = await Movie.find();
+                let showtimes = [];
+                const generateSeats = () => {
+                    const seats = [];
+                    const rows = ['A', 'B', 'C', 'D'];
+                    rows.forEach((row) => {
+                        let type = 'Regular'; let price = 150;
+                        if (row === 'C') { type = 'Premium'; price = 250; }
+                        if (row === 'D') { type = 'Recliner'; price = 400; }
+                        
+                        for (let col = 1; col <= 8; col++) {
+                            seats.push({
+                                id: `${row}${col}`, type, price, 
+                                status: Math.random() > 0.85 ? 'booked' : 'available'
+                            });
+                        }
+                    });
+                    return seats;
+                };
+
+                for (let movie of movies) {
+                    showtimes.push({
+                        movieId: movie._id, theatreName: 'PVR: Inorbit Mall',
+                        date: '2026-06-15', time: '18:30', seats: generateSeats()
+                    });
+                    showtimes.push({
+                        movieId: movie._id, theatreName: 'INOX: GVK One',
+                        date: '2026-06-15', time: '21:00', seats: generateSeats()
+                    });
+                }
+                await Showtime.insertMany(showtimes);
+                console.log(`Auto-seeded ${showtimes.length} showtimes.`);
+            }
+        } catch (seedErr) {
+            console.error('Error during auto-seeding:', seedErr);
+        }
+    })
+    .catch(err => console.error('MongoDB connection error:', err));
+
 // --- Middleware for Authentication ---
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -134,6 +196,14 @@ const authenticateToken = (req, res, next) => {
         req.user = user;
         next();
     });
+};
+
+const isAdmin = (req, res, next) => {
+    if (req.user && req.user.role === 'admin') {
+        next();
+    } else {
+        res.status(403).json({ message: 'Forbidden: Admin access required.' });
+    }
 };
 
 // --- API Endpoints (all defined BEFORE app.listen) ---
@@ -158,9 +228,24 @@ app.post('/api/users/signin', async (req, res) => {
         if (!user) return res.status(400).json({ message: 'Invalid credentials' });
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.status(200).json({ token, message: 'Signed in successfully!' });
+        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.status(200).json({ token, message: 'Signed in successfully!', role: user.role, email: user.email });
     } catch (err) { res.status(500).json({ message: 'Error signing in' }); }
+});
+
+// Promote a user to admin (requires ADMIN_SECRET from .env)
+app.post('/api/admin/promote', authenticateToken, async (req, res) => {
+    const { adminSecret } = req.body;
+    const secret = process.env.ADMIN_SECRET || 'cinemax_admin_2026';
+    if (adminSecret !== secret) {
+        return res.status(403).json({ message: 'Invalid admin secret key.' });
+    }
+    try {
+        await User.findByIdAndUpdate(req.user.id, { role: 'admin' });
+        // Issue a new token with updated role
+        const newToken = jwt.sign({ id: req.user.id, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.json({ message: 'You are now an Admin!', token: newToken, role: 'admin' });
+    } catch (err) { res.status(500).json({ message: 'Error promoting user' }); }
 });
 
 
@@ -200,12 +285,25 @@ app.post('/api/users/reset-password',async(req,res)=>{
         user.resetOtp=undefined;
         user.resetOtpExpiry=undefined;
         await user.save();
-        res.status(200).json({message:'Password reser successfully! You can now sign in,'});
+        res.status(200).json({message:'Password reset successfully! You can now sign in,'});
     }catch(err){
         res.status(500).json({message:'Error resetting the password.'});
     }
 });
 
+app.put('/api/users/:email/role', async (req, res) => {
+    try {
+        const { role } = req.body;
+        if (!['user', 'admin'].includes(role)) return res.status(400).json({ message: 'Invalid role' });
+        
+        const user = await User.findOneAndUpdate({ email: req.params.email }, { role }, { new: true });
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        
+        res.json({ message: `Role updated to ${role} for ${user.email}`, user: { email: user.email, role: user.role } });
+    } catch (err) {
+        res.status(500).json({ message: 'Error updating role' });
+    }
+});
 
 app.get('/api/movies/upload', async (req, res) => {
     try {
@@ -250,9 +348,61 @@ app.get('/api/movies/:id', async (req, res) => {
 
 app.get('/api/movies', async (req, res) => {
     try {
-        const movies = await Movie.find();
-        res.json(movies);
+        const { genre, rating } = req.query;
+        let query = {};
+        
+        if (genre) {
+            query.genres = { $in: [new RegExp(genre, 'i')] };
+        }
+        
+        const movies = await Movie.find(query);
+        
+        // Manual filter for rating if provided (since it's a string in the DB currently)
+        let filteredMovies = movies;
+        if (rating) {
+            const minRating = parseFloat(rating);
+            filteredMovies = movies.filter(m => parseFloat(m.rating) >= minRating);
+        }
+        
+        res.json(filteredMovies);
     } catch (err) { res.status(500).json({ message: 'Error retrieving movies' }); }
+});
+
+app.get('/api/recommendations', authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).populate('watchlist');
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        
+        let prompt = "Recommend 5 movie titles. Only return a comma separated list of titles and nothing else. ";
+        if (user.watchlist && user.watchlist.length > 0) {
+            const titles = user.watchlist.map(m => m.title).join(', ');
+            prompt += `Based on these movies I like: ${titles}.`;
+        } else {
+            prompt += `Recommend some popular blockbuster movies.`;
+        }
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt
+        });
+        const text = response.text;
+        if (!text) return res.json([]);
+        
+        const suggestedTitles = text.split(',').map(t => t.trim().replace(/^"|"$/g, '').replace(/^\d+\.\s*/, '').replace(/\*/g, ''));
+        
+        const regexArray = suggestedTitles.map(t => new RegExp(`^${t}$`, 'i')); // try to match title
+        const recommendedMovies = await Movie.find({ title: { $in: regexArray } }).limit(5);
+        
+        if (recommendedMovies.length < 5) {
+            const extra = await Movie.find({ _id: { $nin: recommendedMovies.map(m => m._id) } }).limit(5 - recommendedMovies.length);
+            recommendedMovies.push(...extra);
+        }
+
+        res.json(recommendedMovies);
+    } catch (err) {
+        console.error('Error in recommendations:', err);
+        res.status(500).json({ message: 'Error fetching recommendations' });
+    }
 });
 
 
@@ -356,6 +506,13 @@ app.post('/api/bookings/verify', authenticateToken, async (req, res) => {
                 { arrayFilters: [{ "elem.id": { $in: seatIds } }], multi: true }
             );
 
+            // Add 50 Gamification points per seat booked
+            const earnedPoints = seatIds.length * 50;
+            await User.findByIdAndUpdate(req.user.id, { $inc: { points: earnedPoints } });
+
+            // Broadcast real-time update
+            io.emit('seatBooked', { showtimeId, seatIds });
+
             // Send Email with PDF
             try {
                 const showtime = await Showtime.findById(showtimeId).populate('movieId');
@@ -394,6 +551,56 @@ app.get('/api/bookings/:id/ticket', async (req, res) => {
     } catch (err) { res.status(500).send('Error generating PDF'); }
 });
 
+// --- Admin Endpoints ---
+app.get('/api/admin/stats', authenticateToken, isAdmin, async (req, res) => {
+    try {
+        const totalUsers = await User.countDocuments();
+        const totalMovies = await Movie.countDocuments();
+        const totalBookings = await Booking.countDocuments();
+        
+        // Aggregate total revenue from confirmed bookings
+        const revenueAgg = await Booking.aggregate([
+            { $match: { status: 'confirmed' } },
+            { $group: { _id: null, totalRevenue: { $sum: '$totalAmount' } } }
+        ]);
+        const totalRevenue = revenueAgg.length > 0 ? revenueAgg[0].totalRevenue : 0;
+
+        res.json({ totalUsers, totalMovies, totalBookings, totalRevenue });
+    } catch (err) {
+        res.status(500).json({ message: 'Error fetching stats' });
+    }
+});
+
+app.post('/api/movies', authenticateToken, isAdmin, async (req, res) => {
+    try {
+        const movie = new Movie(req.body);
+        await movie.save();
+        res.status(201).json({ message: 'Movie created successfully!', movie });
+    } catch (err) {
+        res.status(500).json({ message: 'Error creating movie' });
+    }
+});
+
+app.put('/api/movies/:id', authenticateToken, isAdmin, async (req, res) => {
+    try {
+        const movie = await Movie.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!movie) return res.status(404).json({ message: 'Movie not found' });
+        res.json({ message: 'Movie updated successfully!', movie });
+    } catch (err) {
+        res.status(500).json({ message: 'Error updating movie' });
+    }
+});
+
+app.delete('/api/movies/:id', authenticateToken, isAdmin, async (req, res) => {
+    try {
+        const movie = await Movie.findByIdAndDelete(req.params.id);
+        if (!movie) return res.status(404).json({ message: 'Movie not found' });
+        res.json({ message: 'Movie deleted successfully!' });
+    } catch (err) {
+        res.status(500).json({ message: 'Error deleting movie' });
+    }
+});
+
 // Reviews Endpoints
 app.post('/api/reviews', authenticateToken, async (req, res) => {
     const { movieId, rating, text } = req.body;
@@ -403,11 +610,25 @@ app.post('/api/reviews', authenticateToken, async (req, res) => {
         
         const review = new Review({ userId: req.user.id, movieId, rating, text });
         await review.save();
+        
+        // Add 20 points for review
+        await User.findByIdAndUpdate(req.user.id, { $inc: { points: 20 } });
+        
         res.status(201).json({ message: 'Review added successfully' });
     } catch (err) { res.status(500).json({ message: 'Error adding review' }); }
 });
 
+app.get('/api/users/me', authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        res.json(user);
+    } catch (err) { res.status(500).json({ message: 'Error fetching user data' }); }
+});
+
 // Start the server
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Server running on port ${port}`);
+    // Auto-launch the startup page on Windows
+    exec(`start http://localhost:${port}`);
 });
