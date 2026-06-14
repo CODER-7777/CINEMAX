@@ -1,6 +1,23 @@
 const urlParams = new URLSearchParams(window.location.search);
 const showtimeId = urlParams.get('showtimeId');
 const token = localStorage.getItem('userToken');
+const BASE_URL = 'http://localhost:5000';
+const socket = io(BASE_URL);
+
+socket.on('seatBooked', (data) => {
+    if (data.showtimeId === showtimeId) {
+        const allSeatDivs = document.querySelectorAll('.seat');
+        allSeatDivs.forEach(seatDiv => {
+            if (data.seatIds.includes(seatDiv.innerText)) {
+                seatDiv.classList.remove('available', 'selected', 'premium', 'recliner');
+                seatDiv.classList.add('booked');
+                // Also remove it from current user's selection if they had it selected
+                selectedSeats = selectedSeats.filter(s => s.id !== seatDiv.innerText);
+            }
+        });
+        updateCheckoutPanel();
+    }
+});
 
 if (!token) {
     alert("Please sign in to book tickets!");
@@ -19,7 +36,7 @@ let showtimeData = null;
 
 async function loadShowtime() {
     try {
-        const res = await fetch(`/api/showtimes/${showtimeId}`);
+        const res = await fetch(`${BASE_URL}/api/showtimes/${showtimeId}`);
         if (!res.ok) throw new Error('Showtime not found');
         showtimeData = await res.json();
         
@@ -92,7 +109,7 @@ payBtn.addEventListener('click', async () => {
 
     try {
         // 1. Create Razorpay Order
-        const orderRes = await fetch('/api/bookings/create-order', {
+        const orderRes = await fetch(`${BASE_URL}/api/bookings/create-order`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ amount: totalAmount })
@@ -109,7 +126,7 @@ payBtn.addEventListener('click', async () => {
             order_id: orderData.id,
             handler: async function (response) {
                 // 3. Verify Payment
-                const verifyRes = await fetch('/api/bookings/verify', {
+                const verifyRes = await fetch(`${BASE_URL}/api/bookings/verify`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({
@@ -126,7 +143,7 @@ payBtn.addEventListener('click', async () => {
                 if (verifyData.success) {
                     alert(`Payment Successful! Booking ID: ${verifyData.bookingId}`);
                     // Download the PDF Ticket automatically
-                    window.open(`/api/bookings/${verifyData.bookingId}/ticket`, '_blank');
+                    window.open(`${BASE_URL}/api/bookings/${verifyData.bookingId}/ticket`, '_blank');
                     // Wait a moment before redirecting so the download starts
                     setTimeout(() => {
                         window.location.href = 'makemytrip.html'; 

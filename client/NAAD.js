@@ -1,4 +1,10 @@
 // NAAD.js - Final Polished JavaScript for Authentication and Redirection
+const BASE_URL = 'http://localhost:5000';
+
+// --- Auto-redirect to main page after 4 seconds ---
+let redirectTimer = setTimeout(() => {
+    window.location.href = 'makemytrip.html';
+}, 4000);
 
 // --- Constants for the landing page ---
 const signInButton = document.getElementById('signInBtn');
@@ -8,12 +14,8 @@ const getStartedForm = document.getElementById('getStartedForm');
 if (getStartedForm) {
     getStartedForm.addEventListener('submit', function(event) {
         event.preventDefault(); 
-        const emailInput = getStartedForm.querySelector('input[type="email"]');
-        const email = emailInput.value;
-        if (email) {
-            alert('Thank you for getting started! Please Sign Up/Sign in ...');
-            window.location.href = 'login.html';
-        }
+        clearTimeout(redirectTimer); // Cancel auto-redirect
+        window.location.href = 'makemytrip.html';
     });
 }
 
@@ -41,7 +43,7 @@ if (signInForm) {
         const password = document.getElementById('signInPassword').value;
 
         try {
-            const response = await fetch(`/api/users/signin`, {
+            const response = await fetch(`${BASE_URL}/api/users/signin`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
@@ -67,7 +69,7 @@ if (signUpForm) {
         const password = document.getElementById('signUpPassword').value;
 
         try {
-            const response = await fetch(`/api/users/signup`, {
+            const response = await fetch(`${BASE_URL}/api/users/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),

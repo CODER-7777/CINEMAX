@@ -1,5 +1,6 @@
 const detailsContainer = document.getElementById('movie-details-container');
-const API_BASE_URL = '/api/movies';
+const BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = `${BASE_URL}/api/movies`;
 
 function generateStarHTML(rating) {
     // Convert rating from 0-10 scale to 0-5 stars
@@ -60,7 +61,10 @@ async function fetchAndRenderMovieDetails() {
                             <span>${movie.year || '2024'}</span>
                             <span>${movie.runtime || 'N/A'}</span>
                         </div>
-                        <p style="font-size: 1.1rem; max-width: 600px; line-height: 1.6; color: #d2d2d2;">
+                        <button onclick="document.getElementById('trailer-modal').style.display='flex'" style="margin-top: 15px; background: #e50914; color: white; border: none; padding: 10px 20px; font-size: 1.1rem; border-radius: 4px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                            <ion-icon name="play-circle"></ion-icon> Watch Trailer
+                        </button>
+                        <p style="font-size: 1.1rem; max-width: 600px; line-height: 1.6; color: #d2d2d2; margin-top: 20px;">
                             ${movie.synopsis || 'No synopsis available.'}
                         </p>
                         <p style="margin-top: 15px; color: #808080;"><strong>Genres:</strong> ${movie.genres.join(', ')}</p>
@@ -73,16 +77,18 @@ async function fetchAndRenderMovieDetails() {
 
             <!-- LOWER CONTENT SECTION (Trailer & Details) -->
             <div style="padding: 50px 5%; max-width: 1200px; margin: 0 auto; color: #fff; font-family: 'Inter', sans-serif;">
-                <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; letter-spacing: 1px; margin-bottom: 20px; color: #fff;">Watch Trailer</h2>
                 
-                <!-- YOUTUBE IFRAME -->
-                <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 60px;">
-                    <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
-                            src="https://www.youtube.com/embed/${movie.trailerYoutubeId || 'dQw4w9WgXcQ'}?autoplay=0&rel=0" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen>
-                    </iframe>
+                <!-- TRAILER THEATER MODE MODAL -->
+                <div id="trailer-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center;">
+                    <div style="position: relative; width: 80%; max-width: 900px; aspect-ratio: 16/9; background: #000; border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.8);">
+                        <button onclick="document.getElementById('trailer-modal').style.display='none'" style="position: absolute; top: -40px; right: 0; background: none; border: none; color: white; font-size: 2rem; cursor: pointer;">&times;</button>
+                        <iframe style="width: 100%; height: 100%; border-radius: 8px;" 
+                                src="https://www.youtube.com/embed/${movie.trailerYoutubeId || 'dQw4w9WgXcQ'}?autoplay=0&rel=0" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                        </iframe>
+                    </div>
                 </div>
 
                 <!-- SHOWTIMES SECTION -->
@@ -143,7 +149,7 @@ async function fetchAndRenderMovieDetails() {
             }
 
             try {
-                const res = await fetch('/api/reviews', {
+                const res = await fetch(`${BASE_URL}/api/reviews`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({ movieId: movie._id, rating: parseInt(ratingInput.value), text })
@@ -218,7 +224,7 @@ async function fetchShowtimes(movieId) {
     if (!showtimesContainer) return;
 
     try {
-        const response = await fetch(`/api/showtimes/movie/${movieId}`);
+        const response = await fetch(`${BASE_URL}/api/showtimes/movie/${movieId}`);
         const showtimes = await response.json();
 
         if (showtimes.length === 0) {

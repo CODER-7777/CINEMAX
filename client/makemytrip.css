@@ -1,5 +1,5 @@
 /* ===== IMPORTS ===== */
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 /* ===== RESET ===== */
 * {
@@ -30,7 +30,7 @@ body {
     width: 100%;
     min-height: 100vh;
     background: #141414;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
     color: #e5e5e5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -101,7 +101,7 @@ body {
     outline: none;
     background: transparent;
     font-size: 14px;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     color: #fff;
     padding: 0 10px;
 }
@@ -155,7 +155,7 @@ body {
     height: 32px;
     border-radius: 4px;
     font-size: 13px;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     font-weight: 600;
     color: #fff;
     background: #e50914;
@@ -324,7 +324,7 @@ ul.navitem1 li {
    SECTION TITLES (Netflix Style)
    ============================== */
 .title {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     color: #ffffff;
     padding-left: 147px;
     padding-top: 50px;
@@ -335,7 +335,7 @@ ul.navitem1 li {
 }
 
 .title-enter {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     color: #ffffff;
     padding-left: 147px;
     padding-top: 40px;
@@ -348,7 +348,7 @@ ul.navitem1 li {
 
 .seemore {
     color: #e50914;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 14px;
 }
 
@@ -431,7 +431,7 @@ ul.navitem1 li {
 
 /* Movie Title */
 .movie-title {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 1rem;
     padding: 12px 14px 4px;
     color: #fff;
@@ -460,7 +460,7 @@ ul.navitem1 li {
 }
 
 .rating-text {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 0.8rem;
     color: #46d369;
     font-weight: 600;
@@ -469,7 +469,7 @@ ul.navitem1 li {
 }
 
 .genres-text {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 0.8rem;
     color: #808080;
     font-weight: 400;
@@ -573,7 +573,7 @@ ul.navitem1 li {
     bottom: 10px;
     left: 10px;
     color: white;
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 1.5rem;
     letter-spacing: 1px;
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
@@ -622,7 +622,7 @@ ul.navitem1 li {
 }
 
 .sidenavbar h1 {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 26px;
     color: #fff;
     font-weight: 400;
@@ -659,7 +659,7 @@ ul.navitem1 li {
     width: 140px;
     border-radius: 4px;
     font-size: 12px;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     font-weight: 600;
     border: 1px solid #e50914;
     color: #e50914;
@@ -780,7 +780,7 @@ div .text {
 
 .modal-content h3 {
     text-align: center;
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 22px;
     color: #fff;
     padding-top: 30px;
@@ -867,7 +867,7 @@ div .text {
     height: 28px;
     color: #fff;
     font-size: 13px;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     transition: border-color 0.3s ease;
 }
 
@@ -1036,7 +1036,7 @@ div .text {
     /* flex-shrink: 0; */
 }
 .hero-text h1{
-    font-family:'Bebas Neue',sans-serif;
+    font-family:'Orbitron',sans-serif;
     font-size: 4rem;
     letter-spacing:2px;
     margin-bottom:10px;
@@ -1102,7 +1102,7 @@ div .text {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     transition: transform 0.2s ease;
 }
 

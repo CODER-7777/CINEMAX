@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>CINEMAX</title>
+    <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/x-icon" href="images/fav.png">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
@@ -139,10 +140,17 @@
                     <ion-icon name="menu-outline"></ion-icon>
                  </div>
                 <div class="right-container">
+                    <select id="lang-select" style="background:transparent; color:white; border:none; margin-right: 15px; font-weight: 500; cursor: pointer;">
+                        <option value="en" style="color:black">EN</option>
+                        <option value="hi" style="color:black">HI</option>
+                        <option value="te" style="color:black">TE</option>
+                    </select>
                     <a href="#" class="location">Hyderabad<ion-icon name="caret-down-sharp"></ion-icon></a>
                     
                     <!-- SIGN IN BUTTON -->
+                    <span id="user-points" style="display:none; color: gold; font-weight: bold; margin-right: 15px;">⭐ 0 Pts</span>
                     <button class="signin" id="navbar-auth-btn" onclick="document.getElementById('id01').style.display='block'">Sign In</button>
+                    <button class="signin" id="navbar-logout-btn" style="display:none;">Logout</button>
                     
                     <!-- MODAL WAS MOVED TO THE BOTTOM OF THE PAGE -->
                 </div>
@@ -163,6 +171,7 @@
                     <li><a href='#Movies'>Corporates</a></li>
                     <li><a href='#Movies'>Offers</a></li>
                     <li><a href='#Movies'>Gift Cards</a></li>
+                    <li id="admin-panel-link" style="display:none;"><a href='admin.html' style="color:#E50914; font-weight:700;">⚙ Admin</a></li>
                 </ul>
             </nav>
 
@@ -174,8 +183,36 @@
                 </div>
             </div>
 
-            
-            <h1 class="title" id="movies-section">Recommended Movies</h1>
+            <div id="ai-recommendations-section" style="display: none;">
+                <h1 class="title" style="display:flex; align-items:center; gap: 10px;">
+                    Picked For You <span style="font-size: 0.5em; background: linear-gradient(90deg, #e50914, #ff6b6b); padding: 4px 8px; border-radius: 4px; color: white; font-weight: bold;">AI</span>
+                </h1>
+                <div class="movies-list">
+                    <div class="card-container" id="ai-movie-card-container">
+                        <p style="color: #fff; padding-left: 20px;">Generating recommendations with Gemini AI...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin: 20px 20px 0 20px;">
+                <h1 class="title" id="movies-section" style="margin:0;">Recommended Movies</h1>
+                <div class="filters" style="display:flex; gap:10px;">
+                    <select id="genreFilter" style="background:#333; color:white; padding:8px; border:none; border-radius:4px;">
+                        <option value="">All Genres</option>
+                        <option value="Action">Action</option>
+                        <option value="Drama">Drama</option>
+                        <option value="Comedy">Comedy</option>
+                        <option value="Sci-Fi">Sci-Fi</option>
+                        <option value="Thriller">Thriller</option>
+                        <option value="Romance">Romance</option>
+                    </select>
+                    <select id="ratingFilter" style="background:#333; color:white; padding:8px; border:none; border-radius:4px;">
+                        <option value="">Any Rating</option>
+                        <option value="8">8.0 & Above</option>
+                        <option value="9">9.0 & Above</option>
+                    </select>
+                </div>
+            </div>
             <div class="movies-list">
                 <div class="card-container" id="movie-card-container">
                 </div>
@@ -290,7 +327,15 @@
         </div>
 
     </div>
+    <script src="i18n.js"></script>
     <script src="makemytrip.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js');
+            });
+        }
+    </script>
     <div class="footer">
     <div class="social-links">
         <a href="https://www.linkedin.com/in/m-vivekananda-77b922284/" target="_blank" class="social-link">

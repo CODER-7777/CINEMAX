@@ -1,4 +1,5 @@
-const API_URL = '/api/movies';
+const BASE_URL = 'http://localhost:5000';
+const API_URL = `${BASE_URL}/api/movies`;
 
 function generateStarHTML(rating) {
     // Convert rating from 0-10 scale to 0-5 stars
@@ -20,13 +21,25 @@ const hamburgerIcon=document.getElementById('hamburger-icon');
 const sidebar=document.querySelector('.sidebar');
 const overlay=document.querySelector('.overlay');
 
+const genreFilter = document.getElementById('genreFilter');
+const ratingFilter = document.getElementById('ratingFilter');
+
+if (genreFilter) genreFilter.addEventListener('change', () => fetchAndRenderMovies());
+if (ratingFilter) ratingFilter.addEventListener('change', () => fetchAndRenderMovies());
+
 async function fetchAndRenderMovies(movies = null) {
     try {
         let moviesToRender;
         if (Array.isArray(movies)) {
             moviesToRender = movies;
         } else {
-            const response = await fetch(API_URL);
+            let url = API_URL;
+            const params = new URLSearchParams();
+            if (genreFilter && genreFilter.value) params.append('genre', genreFilter.value);
+            if (ratingFilter && ratingFilter.value) params.append('rating', ratingFilter.value);
+            if (params.toString()) url += `?${params.toString()}`;
+
+            const response = await fetch(url);
             moviesToRender = await response.json();
         }
 
@@ -51,7 +64,52 @@ async function fetchAndRenderMovies(movies = null) {
         }
     } catch (error) {
         console.error('Error fetching movies:', error);
-        movieCardContainer.innerHTML = '<p>No movies found.</p>';
+        if (movieCardContainer) {
+            movieCardContainer.innerHTML = `<p style="color:red;">Error: ${error.message} - ${error.stack}</p>`;
+        }
+    }
+}
+
+async function fetchAndRenderAIRecommendations() {
+    const token = localStorage.getItem('userToken');
+    const aiSection = document.getElementById('ai-recommendations-section');
+    const aiContainer = document.getElementById('ai-movie-card-container');
+    
+    if (!token) {
+        if(aiSection) aiSection.style.display = 'none';
+        return;
+    }
+    
+    if (aiSection) aiSection.style.display = 'block';
+    
+    try {
+        const response = await fetch(`${BASE_URL}/api/recommendations`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const movies = await response.json();
+        
+        aiContainer.innerHTML = '';
+        if (!movies || movies.length === 0) {
+            aiContainer.innerHTML = '<p style="color: #fff; padding-left: 20px;">No recommendations found right now.</p>';
+        } else {
+            movies.forEach(movie => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.innerHTML = `
+                    <a href="movie-details.html?id=${movie._id}" style="text-decoration:none; color:inherit;">
+                        <img src="${movie.posterUrl}" alt="${movie.title}" class="card-img" width="200">
+                        <h3 class="movie-title">${movie.title}</h3>
+                        <p class="rating-text">${generateStarHTML(movie.rating)} ${movie.rating}</p>
+                        <p class="genres-text">Genres: ${movie.genres.join(' / ')}</p>
+                        <span class="watchlist-btn" data-movie-id="${movie._id}">&#x2764;</span>
+                    </a>
+                `;
+                aiContainer.appendChild(card);
+            });
+        }
+    } catch (error) {
+        console.error('Error fetching AI recommendations:', error);
+        if(aiContainer) aiContainer.innerHTML = '<p style="color: #fff; padding-left: 20px;">Could not load AI recommendations.</p>';
     }
 }
 
@@ -66,7 +124,7 @@ movieCardContainer.addEventListener('click', async (e) => {
 
         const movieId = e.target.dataset.movieId;
         try {
-            const response = await fetch('/api/users/watchlist/add', {
+            const response = await fetch(`${BASE_URL}/api/users/watchlist/add`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -89,7 +147,7 @@ if (movieSearchInput) {
         const query = e.target.value;
         if (query.length > 2) {
             try {
-                const response = await fetch(`/api/movies/search?query=${query}`);
+                const response = await fetch(`${BASE_URL}/api/movies/search?query=${query}`);
                 const movies = await response.json();
                 fetchAndRenderMovies(movies);
             } catch (error) {
@@ -124,6 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     fetchAndRenderMovies();
+    fetchAndRenderAIRecommendations();
     checkAuthStatus();
 });
 
@@ -143,20 +202,38 @@ function checkAuthStatus() {
         // Change button to show user avatar + dropdown
         const rightContainer = document.querySelector('.right-container');
         if (rightContainer) {
-            // Replace "Sign In" button with user avatar & logout
+            // Replace "Sign In" button with user avatar & logout & points
             const userInitial = email ? email.charAt(0).toUpperCase() : 'U';
             rightContainer.innerHTML = `
                 <a href="#" class="location">Hyderabad<ion-icon name="caret-down-sharp"></ion-icon></a>
+                <span id="nav-points" style="color: gold; font-weight: bold; margin-right: 15px;">⭐ 0 Pts</span>
                 <div class="user-avatar" id="user-avatar">${userInitial}</div>
                 <button class="signin" id="logout-btn">Logout</button>
             `;
+            
+            // Fetch points
+            fetch(`${BASE_URL}/api/users/me`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            }).then(res => res.json()).then(profile => {
+                if (profile && profile.points !== undefined) {
+                    document.getElementById('nav-points').innerText = `⭐ ${profile.points} Pts`;
+                }
+            }).catch(e => console.error("Could not fetch points:", e));
             
             // Logout handler
             document.getElementById('logout-btn').addEventListener('click', () => {
                 localStorage.removeItem('userToken');
                 localStorage.removeItem('userEmail');
+                localStorage.removeItem('role');
                 window.location.reload();
             });
+        }
+        
+        // Show Admin link if user is admin
+        const role = localStorage.getItem('role');
+        const adminLink = document.getElementById('admin-panel-link');
+        if (role === 'admin' && adminLink) {
+            adminLink.style.display = 'inline';
         }
         
         // Update sidebar greeting
@@ -215,7 +292,7 @@ if (signinForm) {
         const password = document.getElementById('signin-password').value;
 
         try {
-            const response = await fetch('/api/users/signin', {
+            const response = await fetch(`${BASE_URL}/api/users/signin`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
@@ -226,6 +303,7 @@ if (signinForm) {
                 // Save the JWT token to the browser!
                 localStorage.setItem('userToken', data.token);
                 localStorage.setItem('userEmail', email);
+                localStorage.setItem('role', data.role || 'user');
                 document.getElementById('id01').style.display = 'none'; // Close modal
                 alert('Signed in successfully!');
                 window.location.reload(); // Refresh to update navbar
@@ -246,7 +324,7 @@ if (signupForm) {
         const password = document.getElementById('signup-password').value;
 
         try {
-            const response = await fetch('/api/users/signup', {
+            const response = await fetch(`${BASE_URL}/api/users/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
@@ -321,7 +399,7 @@ if(forgotPasswordForm){
         e.preventDefault();
         const email=document.getElementById('forgot-email').value;
         try{
-            const response=await fetch('/api/users/forgot-password',{
+            const response=await fetch(`${BASE_URL}/api/users/forgot-password`,{
                 method:'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email })
@@ -353,7 +431,7 @@ if (resetPasswordForm) {
         const otp = document.getElementById('reset-otp').value;
         const newPassword = document.getElementById('reset-new-password').value;
         try {
-            const response = await fetch('/api/users/reset-password', {
+            const response = await fetch(`${BASE_URL}/api/users/reset-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, otp, newPassword })

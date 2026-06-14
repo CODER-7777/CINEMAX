@@ -1,0 +1,20 @@
+{
+    "name": "CINEMAX Movies",
+    "short_name": "CINEMAX",
+    "start_url": "index.html",
+    "display": "standalone",
+    "background_color": "#0f0f0f",
+    "theme_color": "#E50914",
+    "icons": [
+        {
+            "src": "images/fav.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "images/fav.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
