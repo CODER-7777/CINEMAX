@@ -1,10 +1,7 @@
 // NAAD.js - Final Polished JavaScript for Authentication and Redirection
 const BASE_URL = 'http://localhost:5000';
 
-// --- Auto-redirect to main page after 4 seconds ---
-let redirectTimer = setTimeout(() => {
-    window.location.href = 'makemytrip.html';
-}, 4000);
+// --- Auto-redirect to main page after 4 seconds removed ---
 
 // --- Constants for the landing page ---
 const signInButton = document.getElementById('signInBtn');
@@ -14,7 +11,6 @@ const getStartedForm = document.getElementById('getStartedForm');
 if (getStartedForm) {
     getStartedForm.addEventListener('submit', function(event) {
         event.preventDefault(); 
-        clearTimeout(redirectTimer); // Cancel auto-redirect
         window.location.href = 'makemytrip.html';
     });
 }

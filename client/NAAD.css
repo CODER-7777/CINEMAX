@@ -30,7 +30,10 @@ nav{
 }
 
 .logo{
-    width: 150px;
+    width: 160px;
+    height: 60px;
+    object-fit: contain;
+    object-position: left;
     cursor: pointer;
     margin-right: auto;
 }

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cinemax-cache-v1';
+const CACHE_NAME = 'cinemax-cache-v2';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -11,6 +11,7 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', event => {
+    self.skipWaiting(); // Force immediate activation
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
@@ -36,6 +37,7 @@ self.addEventListener('fetch', event => {
 });
 
 self.addEventListener('activate', event => {
+    event.waitUntil(clients.claim()); // Take control immediately
     const cacheWhitelist = [CACHE_NAME];
     event.waitUntil(
         caches.keys().then(cacheNames => {
